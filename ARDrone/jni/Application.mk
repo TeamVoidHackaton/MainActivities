@@ -1,0 +1,11 @@
+APP_MODULES		:= FFMPEG_ARTOOLKIT
+#APP_OPTIM		:= release
+APP_OPTIM		:= debug
+#APP_ABI			:= armeabi armeabi-v7a
+#APP_ABI         := armeabi
+ABI := armeabi 	#The only one that worked
+APP_PLATFORM    := android-15
+APP_STL 		:= c++_shared
+APP_CPPFLAGS 	:= -frtti -fexceptions
+NDK_TOOLCHAIN_VERSION := clang
+#override APP_MIN_PLATFORM_LEVEL=99
