@@ -1,0 +1,8 @@
+{
+  "name": "leap_drone",
+  "description": "Control an AR Drone with the Leap Motion and Broadway.js to stream video to the browser",
+  "version": "1.0.0",
+  "dependencies": {
+    "jquery": "~1.8"
+  }
+}

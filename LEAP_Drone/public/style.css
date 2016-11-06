@@ -1,0 +1,28 @@
+body{
+	font-family: 'Open Sans';
+}
+
+h1, h4{
+	text-align: center;
+}
+
+table, form{
+	display: block;
+	margin: 0 auto;
+	width: 60%;
+}
+
+#placeholder {
+	height: 100%;
+	width: 100%;
+}
+
+#directionText {
+	font-family: Verdana;
+	font-size: 25px;
+	fill: white
+}
+
+#highlight {
+	fill: green;
+}
