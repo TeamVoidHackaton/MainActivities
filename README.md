@@ -10,5 +10,5 @@ Android SDK,
 Google Cardboard API,
 ARBase library for Android,
 
-For Leap Motion:
+For LEAP_Drone:
 Node libraries for parrot and leap motion
