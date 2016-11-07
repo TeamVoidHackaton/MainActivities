@@ -1,10 +1,4 @@
 
-package com.example.ardrone;
-
-import org.artoolkit.ar.base.assets.AssetHelper;
-
-import android.app.Application;
-import android.preference.PreferenceManager;
 
 public class AssetsCache extends Application {
 
@@ -33,7 +27,5 @@ public class AssetsCache extends Application {
     	// N.B.: If contents of assets folder changes, be sure to increment the
     	// versionCode integer in the AndroidManifest.xml file.
 		AssetHelper assetHelper = new AssetHelper(getAssets());        
-		assetHelper.cacheAssetFolder(getInstance(), "Data");
-		assetHelper.cacheAssetFolder(getInstance(), "OSG");
     }
 }

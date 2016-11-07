@@ -1,65 +1,14 @@
 package com.example.ardrone;
 
 import android.app.ActionBar;
-import android.content.Context;
-import android.content.pm.ActivityInfo;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.PixelFormat;
-import android.graphics.SurfaceTexture;
-import android.graphics.SurfaceTexture.OnFrameAvailableListener;
-import android.media.MediaPlayer;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.Uri;
-import android.opengl.GLES10;
-import android.opengl.GLES11;
-import android.opengl.GLES20;
-import android.opengl.GLSurfaceView;
-import android.opengl.GLUtils;
-import android.opengl.Matrix;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Vibrator;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.Display;
-import android.view.Surface;
-import android.view.View;
-import android.view.ViewGroup.LayoutParams;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.FrameLayout;
-import android.widget.MediaController;
-import com.google.vrtoolkit.cardboard.*;
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
 
-public class MainActivity extends CardboardActivity implements CardboardView.StereoRenderer, OnFrameAvailableListener {
+public class MainActivity extends CardboardActivity implements CardboardView.StereoRenderer{
 
-	static {
-		System.loadLibrary("c++_shared");
-    	System.loadLibrary("FFMPEG_ARTOOLKIT");
-    }
-    
-	// ARTOOLKIT lifecycle native functions
-	public static native boolean nativeCreate(Context ctx);
-	public static native boolean nativeStart();
-	// ARTOOLKIT OpenGL native functions
-	public static native void ARSurfaceCreated();
-    public static native void ARDrawFrame();
-	
 	// CARDBOARD declarations
     private static final String TAG = "MainActivity";
     private static final int GL_TEXTURE_EXTERNAL_OES = 0x8D65;
@@ -86,16 +35,6 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     private short drawOrder2[] = {2, 0, 3, 3, 0, 1}; 
     private final int vertexStride = COORDS_PER_VERTEX * 4; 
     private ByteBuffer indexBuffer;    
-    private int texture;
-	private CardboardView cardboardView;
-	private SurfaceTexture mSurfaceTexture;
-	private StreamingSurface mSurfaceStreaming;
-	private Surface mSurface;
-	private OnFrameAvailableListener mOnFrameAvailableListener;
-    private final float[] mMVPMatrix = new float[16];
-    private final float[] mProjectionMatrix = new float[16];
-    private final float[] mViewMatrix = new float[16];
-    private final float[] mRotationMatrix = new float[16];
     private float mAngle;
 	
     private int loadGLShader(int type, String code) {
@@ -169,18 +108,6 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     public void onSurfaceCreated(EGLConfig config) {
         
     	Log.i(TAG, "onSurfaceCreated");
-        GLES20.glClearColor(0.1f, 0.1f, 0.1f, 0.5f); 
-        
-	
-        StreamSurfaceCreated();
-        
-	
-		ARSurfaceCreated();
-        
-        // Set surface to be used as a texture
-        texture = createTexture();
-		mSurfaceTexture = new SurfaceTexture(texture);
-		mSurfaceTexture.setOnFrameAvailableListener(this);
 		mSurface = new Surface(mSurfaceTexture);
 		mSurfaceStreaming = new StreamingSurface(mSurface);
 		
@@ -213,12 +140,6 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         
     	GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
         
-    	// Draw OpenGL stream surface
-    	StreamDrawFrame();
-        
-    	// Draw OpenGL AR surface
-    	ARDrawFrame();
-        
     }
     
     public void StreamSurfaceCreated(){
@@ -244,11 +165,6 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         int vertexShader = loadGLShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
         int fragmentShader = loadGLShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
         
-        // CREATE PROGRAM, ATTACH SHADERS, LINK PROGRAM
-        mProgram = GLES20.glCreateProgram();             
-        GLES20.glAttachShader(mProgram, vertexShader);   
-        GLES20.glAttachShader(mProgram, fragmentShader); 
-        GLES20.glLinkProgram(mProgram);  
         
         // DECLARING BUFFERS
         ByteBuffer bb = ByteBuffer.allocateDirect(squareVertices.length * 4);
@@ -256,12 +172,6 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         vertexBuffer = bb.asFloatBuffer();
         vertexBuffer.put(squareVertices);
         vertexBuffer.position(0);
-        
-        ByteBuffer dlb = ByteBuffer.allocateDirect(drawOrder.length * 2);
-        dlb.order(ByteOrder.nativeOrder());
-        drawListBuffer = dlb.asShortBuffer();
-        drawListBuffer.put(drawOrder);
-        drawListBuffer.position(0);
        
         ByteBuffer bb2 = ByteBuffer.allocateDirect(textureVertices.length * 4);
         bb2.order(ByteOrder.nativeOrder());
@@ -279,12 +189,6 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     	GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, texture);
         
-        mPositionHandle = GLES20.glGetAttribLocation(mProgram, "position");
-        GLES20.glEnableVertexAttribArray(mPositionHandle);
-        GLES20.glVertexAttribPointer(mPositionHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT,false,vertexStride, vertexBuffer);
-        
-        mTextureCoordHandle = GLES20.glGetAttribLocation(mProgram, "inputTextureCoordinate");
-        GLES20.glEnableVertexAttribArray(mTextureCoordHandle);
         GLES20.glVertexAttribPointer(mTextureCoordHandle, COORDS_PER_VERTEX, GLES20.GL_FLOAT,false,vertexStride, textureVerticesBuffer);
 
         //mColorHandle = GLES20.glGetAttribLocation(mProgram, "s_texture");
@@ -319,16 +223,6 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     public void onCardboardTrigger() {
     }
     
-    @Override
-    public void onRendererShutdown() {
-        Log.i(TAG, "onRendererShutdown");
-    }
-
-    @Override
-    public void onSurfaceChanged(int width, int height) {
-        Log.i(TAG, "onSurfaceChanged");
-    }
-	
 	    @Override
 	public void onFrameAvailable(SurfaceTexture arg0) {
 		this.cardboardView.requestRender();
