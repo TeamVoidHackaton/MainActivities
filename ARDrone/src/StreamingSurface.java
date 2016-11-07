@@ -5,12 +5,6 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.SurfaceTexture;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.SystemClock;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.TextureView;
@@ -24,10 +18,6 @@ import android.view.TextureView;
 	// Native libraries (FFMPEG)
 	private static native int naInit(String pVideoFileName);
 	private static native int[] naGetVideoRes();
-	private static native int naGetDuration();
-	private static native int naGetFrameRate();
-	private static native int naFinish(Bitmap bitmap);
-	private static native int naGetVideoFrame(Surface surface);
 	private static native int naPrepareDisplay(Bitmap bitmap, int width, int height);
 	private static native void naQuit();
 	
@@ -43,12 +33,6 @@ import android.view.TextureView;
 	private final Paint prFramePaint = new Paint();
 	private int mDrawTop, mDrawLeft;
 	public int mDisplayWidth, mDisplayHeight;	
-	private Thread thread;
-	private SurfaceHolder surfaceHolder;
-	private int mStatus = 0;	//0: not started, 1: playing, 2: paused
-	private int mVideoDuration = 0;
-	private int mVideoCurrentFrame = 0;
-	private int mVideoFR = 0;
 	private String mVideoFileName = "";
 	private int screenWidth;
 	private int screenHeight;
